@@ -17,7 +17,7 @@ def main(args):
     if not isinstance(InFiles, list):
         InFiles = [args.infiles]
     
-    
+    #hover over functions to see their documentation
     for filename in InFiles:
         measurement_data = models.read_variable_from_csv(filename)
         
