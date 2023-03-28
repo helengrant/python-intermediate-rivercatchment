@@ -1,0 +1,27 @@
+name: CI #continuous integration script
+
+on: push #when to run
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository #human-readable so we know what's going on
+        uses: actions/checkout@v2 #use a standard git action, we are using version 2
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10" #pass a string not a number, or it will simplify 3.10 to 3.1
+
+      - name: Install python dependencies
+        run: | #| indicates we are writing a shell script below to be run
+          python3 -m pip install --upgrade pip
+          pip3 install -r requirements.txt
+
+      - name: Test with PyTest
+        run: |
+          python -m pytest --cov=catchment.models tests/test_models.py

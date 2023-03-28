@@ -5,7 +5,8 @@ import pandas.testing as pdt
 import datetime
 import pytest
 
-#These tests with the parametrize inputs are useful for scaling, and negate the use of the later individual unit tests
+
+#These tests with the 'parametrize' inputs are useful for scaling, and negate the use of the later individual unit tests
 @pytest.mark.parametrize(
     "test_data, test_index, test_columns, expected_data, expected_index, expected_columns",
     [
@@ -106,6 +107,15 @@ def test_daily_max(test_data, test_index, test_columns,
     pdt.assert_frame_equal(
         daily_max(pd.DataFrame(data=test_data, index=test_index, columns=test_columns)),
         pd.DataFrame(data=expected_data, index=expected_index, columns=expected_columns))
+
+
+def test_daily_min_python_lists():
+    """Test for attribute errors when passing a list"""
+    from catchment.models import daily_min
+
+    with pytest.raises(AttributeError):
+        daily_min([[1, 2, 3], [4, 5, 6]])
+
 
 #These tests are individual unit tests useful for small projects, but the above is more scalable
 def test_daily_mean_zeros():
