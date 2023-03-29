@@ -8,6 +8,8 @@ time across all sites.
 """
 
 import pandas as pd
+import numpy as np
+
 
 def read_variable_from_csv(filename):
     """Reads a named variable from a CSV file, and returns a
@@ -34,6 +36,7 @@ def read_variable_from_csv(filename):
 
     return newdataset
 
+
 def daily_total(data):
     """Calculate the daily total of a 2D data array.
 
@@ -41,6 +44,7 @@ def daily_total(data):
                  Index must be np.datetime64 compatible format. Columns are measurement sites.
     :returns: A 2D pandas dataframe with total values of measurement for each day."""
     return data.groupby(data.index.date).sum()
+
 
 def daily_mean(data):
     """Calculate the daily mean of a 2d data array.
@@ -67,3 +71,8 @@ def daily_min(data):
     :returns: A 2D Pandas data frame with minimum values of the measurements for each day."""
     return data.groupby(data.index.date).min()
 
+
+def data_normalise(data):
+    """Normalise any given 2D array"""
+    max_array = np.array(np.max(data, axis=0))
+    return data / max_array[np.newaxis, :]
