@@ -109,6 +109,7 @@ def test_daily_max(test_data, test_index, test_columns,
         pd.DataFrame(data=expected_data, index=expected_index, columns=expected_columns))
 
 
+
 def test_daily_min_python_lists():
     """Test for attribute errors when passing a list"""
     from catchment.models import daily_min

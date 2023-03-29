@@ -9,6 +9,7 @@ time across all sites.
 
 import pandas as pd
 import numpy as np
+from functools import reduce
 
 
 def read_variable_from_csv(filename):
@@ -76,3 +77,14 @@ def data_normalise(data):
     """Normalise any given 2D array"""
     max_array = np.array(np.max(data, axis=0))
     return data / max_array[np.newaxis, :]
+
+
+def data_above_threshold(site_id, data, threshold):
+    """Determine whether measurement value is above given threshold and count them"""
+    def count_above_threshold(a, b):
+        if b:
+            return a+1
+        else:
+            return a
+    above_threshold = (map(lambda x: x > threshold, data[site_id]))
+    return reduce(count_above_threshold, above_threshold, 0)
