@@ -88,3 +88,61 @@ def data_above_threshold(site_id, data, threshold):
             return a
     above_threshold = (map(lambda x: x > threshold, data[site_id]))
     return reduce(count_above_threshold, above_threshold, 0)
+
+
+class MeasurementSeries: # A new class separate from sites that contains the data
+    def __init__(self, series, name, units):
+        self.series = series # This will be the data
+        self.name = name # This will be the name
+        self.units = units # This will be the units of the data
+        self.series.name = self.name
+
+    def add_measurement(self, data):
+        self.series = pd.concat([self.series, data])
+        self.series.name = self.name
+
+    def __str__(self): # Make sure printing shows strings rather than data types
+        if self.units:
+            return f"{self.name} ({self.units})"
+        else:
+            return self.name
+
+
+class Location: # A little class of just location name
+    def __init__(self, name):
+        self.name = name
+    def __str__(self):
+        return self.name
+
+class Site(Location): # Creating a 'site' class that inherits information from the Location
+    """A measurement site in the study."""
+    version = 0.1
+
+    def __init__(self, name):
+        super().__init__(name) # Because we are inheriting a name from the Location class
+        self.measurements = {}
+
+    def add_measurement(self, measurement_id, data, units=None):
+        if measurement_id in self.measurements.keys():
+            self.measurements[measurement_id].add_measurement(data)
+        else:
+            self.measurements[measurement_id] = MeasurementSeries(data, measurement_id, units)
+
+    @classmethod
+    def get_version(cls): # This means you can print the version as a string
+        return "version "+str(cls.version)
+
+    @staticmethod
+    def create_sample_site():
+        return Site("sample")
+
+    def __str__(self): # this is so that if you print name it gives a string not the representation
+        return self.name
+
+    @property # You can pretend a function looks like an attribute in your class
+    def last_measurements(self): # Essentially a function with no arguments/inputs
+        return pd.concat(
+            [self.measurements[key][-1:]
+             for key in self.measurements.keys()], axis=1).sort_index()
+
+
