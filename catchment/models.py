@@ -156,3 +156,4 @@ class Catchment(Location):
                 return
 
         self.sites[new_site.name] = Site(new_site)
+
