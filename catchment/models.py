@@ -9,6 +9,8 @@ time across all sites.
 
 import pandas as pd
 import numpy as np
+import geopandas as gpd
+
 
 def read_variable_from_csv(filename):
     """Reads a named variable from a CSV file, and returns a
@@ -22,8 +24,8 @@ def read_variable_from_csv(filename):
     """
     dataset = pd.read_csv(filename, usecols=['Date', 'Site', 'Rainfall (mm)'])
 
-    dataset = dataset.rename({'Date':'OldDate'}, axis='columns')
-    dataset['Date'] = [pd.to_datetime(x,dayfirst=True) for x in dataset['OldDate']]
+    dataset = dataset.rename({'Date': 'OldDate'}, axis='columns')
+    dataset['Date'] = [pd.to_datetime(x, dayfirst=True) for x in dataset['OldDate']]
     dataset = dataset.drop('OldDate', axis='columns')
 
     newdataset = pd.DataFrame(index=dataset['Date'].unique())
@@ -35,6 +37,7 @@ def read_variable_from_csv(filename):
 
     return newdataset
 
+
 def daily_total(data):
     """Calculate the daily total of a 2D data array.
 
@@ -43,6 +46,7 @@ def daily_total(data):
     :returns: A 2D Pandas data frame with total values of the measurements for each day.
     """
     return data.groupby(data.index.date).sum()
+
 
 def daily_mean(data):
     """Calculate the daily mean of a 2D data array.
@@ -72,6 +76,7 @@ def daily_min(data):
     :returns: A 2D Pandas data frame with minimum values of the measurements for each day.
     """
     return data.groupby(data.index.date).min()
+
 
 def data_normalise(data):
     """Calculate the normalised values for each column in a given 2D array.
@@ -113,9 +118,15 @@ class Location:
 
 
 class Site(Location):
-    def __init__(self, name):
+    def __init__(self, name, longitude=None, latitude=None):
         super().__init__(name)
         self.measurements = {}
+        if longitude and latitude:
+            self.location = gpd.GeoDataFrame(
+                            geometry=gpd.points_from_xy([longitude], [latitude], crs='EPSG:4326')
+                            )
+        else:
+            self.location = gpd.GeoDataFrame()
 
     def add_measurement(self, measurement_id, data, units=None):
         if measurement_id in self.measurements.keys():
@@ -130,12 +141,12 @@ class Site(Location):
             [self.measurements[key].series[-1:] for key in self.measurements.keys()],
             axis=1).sort_index()
 
+
 class Catchment(Location):
     """A catchment area in the study."""
     def __init__(self, name):
         super().__init__(name)
         self.sites = {}
-
 
     def add_site(self, new_site):
         # Basic check to see if the site has already been added to the catchment area
